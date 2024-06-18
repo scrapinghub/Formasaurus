@@ -44,19 +44,24 @@ class FormElements(BaseFormFeatureExtractor):
     def get_form_features(self, form):
         typecounts = _get_type_counts(form)
         return {
+            #
             "has <textarea>": typecounts["textarea"] > 0,
             "has <input type=radio>": typecounts["radio"] > 0,
             "has <select>": typecounts["select"] > 0,
             "has <input type=checkbox>": typecounts["checkbox"] > 0,
             "has <input type=email>": typecounts["email"] > 0,
+            #
             "2 or 3 inputs": len(form.inputs.keys()) in {2, 3},
+            #
             "no <input type=password>": typecounts["password"] == 0,
             "exactly one <input type=password>": typecounts["password"] == 1,
             "exactly two <input type=password>": typecounts["password"] == 2,
+            #
             "no <input type=text>": typecounts["text"] == 0,
             "exactly one <input type=text>": typecounts["text"] == 1,
             "exactly two <input type=text>": typecounts["text"] == 2,
             "3 or more <input type=text>": typecounts["text"] >= 3,
+            #
             "<form method": form.method.lower().strip() or "MISSING",
         }
 
