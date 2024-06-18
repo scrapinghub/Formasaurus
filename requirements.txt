@@ -1,9 +1,0 @@
-lxml
-docopt
-tqdm >= 2.0
-tldextract
-requests
-sklearn-crfsuite >= 0.3.1
-
-# 0.18 is need for GroupKFold
-scikit-learn >= 0.18
