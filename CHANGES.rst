@@ -1,6 +1,40 @@
 Changes
 =======
 
+0.9.0 (2024-06-DD)
+------------------
+
+* Dropped official support for Python 3.7 and lower, and added official support
+  for Python 3.8 and higher.
+
+* Added support for the latest versions of all dependencies, and upgraded
+  minimum supported versions of dependencies as follows:
+
+  * ``docopt``: ``0.4.0``
+
+  * ``requests``: ``1.0.0``
+
+  * ``tldextract``: ``1.2.0``
+
+  * ``with-deps`` extra dependencies:
+
+    * ``joblib``: ``1.2.0``
+
+    * ``lxml``: ``4.4.1``
+
+    * ``lxml-html-clean``: ``0.1.0``
+
+    * ``scikit-learn``: ``0.18.0`` → ``0.24.0``
+
+    * ``scipy``: ``1.5.1``
+
+    * ``sklearn-crfsuite``: ``0.3.1`` → ``0.5.1``
+
+* https://github.com/scrapinghub/formasaurus is the new code repository,
+  replacing https://github.com/TeamHG-Memex/Formasaurus.
+
+* Updated the CI configuration and development tooling.
+
 0.8.1 (2018-07-02)
 ------------------
 
