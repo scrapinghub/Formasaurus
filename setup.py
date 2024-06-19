@@ -28,7 +28,7 @@ setup(
     license="MIT license",
     long_description=open("README.rst").read() + "\n\n" + open("CHANGES.rst").read(),
     description="Formasaurus tells you the types of HTML forms and their fields using machine learning",
-    url="https://github.com/TeamHG-Memex/Formasaurus",
+    url="https://github.com/scrapinghub/Formasaurus",
     zip_safe=False,
     packages=["formasaurus"],
     install_requires=[

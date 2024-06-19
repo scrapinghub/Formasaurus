@@ -171,7 +171,7 @@ html_sidebars = {
 }
 html_theme_options = {
     "description": "Formasaurus detects HTML form and field types using machine learning.",
-    "github_user": "TeamHG-Memex",
+    "github_user": "scrapinghub",
     "github_repo": "Formasaurus",
     "github_banner": True,
     "github_button": False,
