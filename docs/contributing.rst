@@ -4,8 +4,8 @@ Contributing
 Development
 -----------
 
-* Source code: https://github.com/TeamHG-Memex/Formasaurus
-* Issue tracker: https://github.com/TeamHG-Memex/Formasaurus/issues
+* Source code: https://github.com/scrapinghub/Formasaurus
+* Issue tracker: https://github.com/scrapinghub/Formasaurus/issues
 
 Feel free to submit ideas, bugs reports and pull requests.
 

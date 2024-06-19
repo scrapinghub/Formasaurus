@@ -29,8 +29,8 @@ from a predefined set of types. Features include:
 See `Form Type Detection.ipynb`_ IPython notebook for more detailed description.
 
 .. _Logistic Regression: https://en.wikipedia.org/wiki/Logistic_regression
-.. _Form Type Detection.ipynb: https://github.com/TeamHG-Memex/Formasaurus/blob/master/notebooks/Form%20Type%20Detection.ipynb
-.. _data: https://github.com/TeamHG-Memex/Formasaurus/tree/master/formasaurus/data
+.. _Form Type Detection.ipynb: https://github.com/scrapinghub/Formasaurus/blob/master/notebooks/Form%20Type%20Detection.ipynb
+.. _data: https://github.com/scrapinghub/Formasaurus/tree/master/formasaurus/data
 
 Field Type Detection
 --------------------
