@@ -1,6 +1,7 @@
 import os
 
 import joblib
+from lxml.html import HtmlElement
 
 from formasaurus import fieldtype_model, formtype_model
 from formasaurus.html import get_fields_to_annotate, get_forms, load_html
@@ -10,15 +11,30 @@ from formasaurus.utils import at_root, dependencies_string, thresholded
 DEFAULT_DATA_PATH = at_root("data")
 
 
-def extract_forms(tree_or_html, proba=False, threshold=0.05, fields=True):
-    """
-    Given a lxml tree or HTML source code, return a list of
-    ``(form_elem, form_info)`` tuples.
+def extract_forms(
+    tree_or_html: HtmlElement | str | bytes,
+    proba: bool = False,
+    threshold: float = 0.05,
+    fields: bool = True,
+):
+    """Return a list of ``(form_elem, form_info)`` tuples, one tuple for each
+    form found on *tree_or_html*.
 
-    ``form_info`` dicts contain results of :meth:`classify` or
-    :meth:`classify_proba`` calls, depending on ``proba`` parameter.
+    ``form_info`` are :class:`dict` object with the results of :meth:`classify`
+    or :meth:`classify_proba`` calls, depending on *proba*.
 
-    When ``fields`` is False, field type information is not computed.
+    *tree_or_html* is the HTML document from which form data should be
+    extracted, either an lxml tree or HTML source code as a string or bytes.
+
+    *proba* determines whether *form_info* values in the result include
+    probability data (``True``) or not (``False``, default).
+
+    *threshold* is the minimum probability, in a [1, 0] range, for data to be
+    included in the result.
+
+    *fields* determines whether field type data is computed and included into
+    the *form_info* values in the result (``True``, default) or not
+    (``False``).
     """
     return get_instance().extract_forms(
         tree_or_html=tree_or_html,
