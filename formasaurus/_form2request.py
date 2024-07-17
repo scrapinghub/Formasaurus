@@ -88,9 +88,6 @@ def build_submission(
     ]
     if matching_fields:
         field_name, _ = max(matching_fields, key=lambda entry: entry[1])
-        try:
-            submit_button = form.xpath(f".//*[@name='{field_name}']")[0]
-        except IndexError:
-            pass
+        submit_button = form.xpath(f".//*[@name='{field_name}']")[0]
 
     return form, data, submit_button
