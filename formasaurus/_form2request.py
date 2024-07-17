@@ -1,6 +1,6 @@
 """High-level API for easier integration with form2request."""
 
-from typing import Dict, Optional, Tuple
+from __future__ import annotations
 
 from lxml.html import FormElement, HtmlElement
 from parsel import Selector, SelectorList
@@ -9,12 +9,12 @@ from .classifiers import extract_forms
 
 
 def build_submission(
-    html: str | HtmlElement | Selector | SelectorList,
+    html: bytes | str | HtmlElement | Selector | SelectorList,
     form_type: str,
-    fields: Dict[str, str] = None,
+    fields: dict[str, str] = None,
     *,
     min_proba: float = 0.05,
-) -> Tuple[FormElement, Dict[str, str], Optional[HtmlElement]]:
+) -> tuple[FormElement, dict[str, str], HtmlElement | None]:
     """Return the form, data, and submit button to submit an HTML form.
 
     *html* is the source HTML response, where the form to submit will be found.

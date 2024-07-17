@@ -33,7 +33,7 @@ setup(
     packages=["formasaurus"],
     install_requires=[
         "docopt >= 0.4.0",
-        "parsel",
+        "parsel >= 1.1.0",
         "requests >= 1.0.0",
         "tldextract >= 1.2.0",
         "tqdm >= 2.0",
