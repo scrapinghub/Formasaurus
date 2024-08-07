@@ -3,6 +3,8 @@
 API Reference
 =============
 
+.. autofunction:: formasaurus.build_submission
+
 Classifiers
 -----------
 

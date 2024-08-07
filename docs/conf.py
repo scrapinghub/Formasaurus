@@ -14,52 +14,11 @@
 
 import os
 import sys
-from unittest.mock import MagicMock
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath(".."))
-
-
-class Mock(MagicMock):
-    @classmethod
-    def __getattr__(cls, name):
-        if name == "_mock_methods":
-            raise AttributeError()
-        return Mock()
-
-
-MOCK_MODULES = [
-    "sklearn",
-    "sklearn.metrics",
-    "sklearn.externals",
-    "sklearn.feature_extraction",
-    "sklearn.feature_extraction.text",
-    "sklearn.pipeline",
-    "sklearn.linear_model",
-    "sklearn.svm",
-    "sklearn.model_selection",
-    "sklearn.grid_search",
-    "sklearn.cross_validation",
-    "tqdm",
-    "tabulate",
-    "numpy",
-    "scipy",
-    "scipy.stats",
-    "pycrfsuite",
-    "sklearn_crfsuite",
-    "sklearn_crfsuite.metrics",
-    "sklearn_crfsuite.utils",
-    "lxml",
-    "lxml.html",
-    "lxml.html.clean",
-    "ipywidgets",
-    "IPython",
-    "IPython.display",
-]
-
-sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 # -- General configuration ------------------------------------------------
 
@@ -71,6 +30,7 @@ sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     "alabaster",
 ]
@@ -350,3 +310,12 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 # texinfo_no_detailmenu = False
+
+
+# -- Intersphinx ----------------------------------------------------------
+
+intersphinx_disabled_reftypes = []
+intersphinx_mapping = {
+    "form2request": ("https://form2request.readthedocs.io/en/latest/", None),
+    "requests": ("https://requests.readthedocs.io/en/latest/", None),
+}
