@@ -1,5 +1,6 @@
 import os
 import sys
+from warnings import warn
 
 import requests
 import tldextract
@@ -66,6 +67,7 @@ def inverse_mapping(dct):
 
 def at_root(*args):
     """Return path relative to formasaurus source code"""
+    warn("formasaurus.utils.at_root is deprecated.", DeprecationWarning)
     return os.path.join(os.path.dirname(__file__), *args)
 
 

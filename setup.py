@@ -15,6 +15,7 @@ with_deps_extras = [
     "joblib >= 1.2.0",
     "lxml >= 4.4.1",
     "lxml-html-clean >= 0.1.0",
+    "platformdirs >= 3.2.0",
     "scikit-learn >= 0.24.0",
     "scipy >= 1.5.1",
     "sklearn-crfsuite >= 0.5.0",
