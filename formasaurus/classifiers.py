@@ -9,12 +9,9 @@ from platformdirs import user_data_path
 from formasaurus import fieldtype_model, formtype_model
 from formasaurus.html import get_fields_to_annotate, get_forms, load_html
 from formasaurus.storage import Storage
-from formasaurus.utils import dependencies_string, thresholded
+from formasaurus.utils import at_root, dependencies_string, thresholded
 
-USER_DATA_PATH = user_data_path(
-    appname="Formasaurus", appauthor="Zyte", roaming=True, ensure_exists=True
-)
-DEFAULT_DATA_PATH = USER_DATA_PATH / "data"
+DEFAULT_DATA_PATH = at_root("data")
 
 
 def extract_forms(
@@ -118,7 +115,7 @@ class FormFieldClassifier:
             filename = cls._cached_model_path()
 
         if rebuild or (autocreate and not os.path.exists(filename)):
-            ex = cls.trained_on(str(DEFAULT_DATA_PATH))
+            ex = cls.trained_on(DEFAULT_DATA_PATH)
             ex.save(filename)
             return ex
 
@@ -243,7 +240,10 @@ class FormFieldClassifier:
         env_path = os.environ.get("FORMASAURUS_MODEL")
         if env_path:
             return os.path.expanduser(env_path)
-        path = USER_DATA_PATH / ("formasaurus-%s.joblib" % dependencies_string())
+        writable_folder = user_data_path(
+            appname="Formasaurus", appauthor="Zyte", roaming=True, ensure_exists=True
+        )
+        path = writable_folder / ("formasaurus-%s.joblib" % dependencies_string())
         return str(path)
 
     @property
