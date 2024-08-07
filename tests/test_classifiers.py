@@ -1,10 +1,7 @@
-from pathlib import Path
-
 import pytest
 
 import formasaurus
 from formasaurus import classifiers
-from formasaurus.classifiers import FormFieldClassifier
 from formasaurus.html import get_forms
 
 
@@ -79,13 +76,3 @@ def test_classify_proba(tree):
     res1 = formasaurus.classify_proba(form, threshold=0.05)
     res2 = formasaurus.extract_forms(tree, proba=True, threshold=0.05)[0][1]
     assert res1 == res2
-
-
-def test_model_path_default():
-    """Make sure that the default path for the model is not relative to the
-    source code, as that path would not be writable in a system-wide package
-    installation.
-    """
-    default_path = FormFieldClassifier._cached_model_path()
-    src_dir = str(Path(classifiers.__file__).parent.parent)
-    assert not default_path.startswith(src_dir)

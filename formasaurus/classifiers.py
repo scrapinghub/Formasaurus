@@ -112,7 +112,22 @@ class FormFieldClassifier:
 
         """
         if filename is None:
-            filename = cls._cached_model_path()
+            env_path = os.environ.get("FORMASAURUS_MODEL")
+            if env_path:
+                filename = os.path.expanduser(env_path)
+            elif rebuild:
+                writable_folder = user_data_path(
+                    appname="Formasaurus",
+                    appauthor="Zyte",
+                    roaming=True,
+                    ensure_exists=True,
+                )
+                path = writable_folder / (
+                    "formasaurus-%s.joblib" % dependencies_string()
+                )
+                filename = str(path)
+            else:
+                filename = at_root("data", "built-in-model.joblib")
 
         if rebuild or (autocreate and not os.path.exists(filename)):
             ex = cls.trained_on(DEFAULT_DATA_PATH)
@@ -234,17 +249,6 @@ class FormFieldClassifier:
             ]
         else:
             return [(form, self.classify(form, fields)) for form in forms]
-
-    @classmethod
-    def _cached_model_path(cls):
-        env_path = os.environ.get("FORMASAURUS_MODEL")
-        if env_path:
-            return os.path.expanduser(env_path)
-        writable_folder = user_data_path(
-            appname="Formasaurus", appauthor="Zyte", roaming=True, ensure_exists=True
-        )
-        path = writable_folder / ("formasaurus-%s.joblib" % dependencies_string())
-        return str(path)
 
     @property
     def form_classes(self):

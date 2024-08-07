@@ -13,11 +13,10 @@ def get_version():
 
 with_deps_extras = [
     "joblib >= 1.2.0",
-    "lxml >= 4.4.1",
+    "lxml >= 4.5.2",
     "lxml-html-clean >= 0.1.0",
-    "platformdirs >= 3.2.0",
-    "scikit-learn >= 0.24.0",
-    "scipy >= 1.5.1",
+    "scikit-learn >= 1.5.0",
+    "scipy >= 1.6.2",
     "sklearn-crfsuite >= 0.5.0",
 ]
 
@@ -35,13 +34,18 @@ setup(
     install_requires=[
         "docopt >= 0.4.0",
         "parsel >= 1.1.0",
+        "platformdirs >= 3.2.0",
         "requests >= 1.0.0",
         "tldextract >= 1.2.0",
         "tqdm >= 2.0",
         "w3lib >= 1.13.0",
     ],
     package_data={
-        "formasaurus": ["data/*.json", "data/html/*.html"],
+        "formasaurus": [
+            "data/*.json",
+            "data/html/*.html",
+            "data/built-in-model.joblib",
+        ],
     },
     extras_require={
         # Work around https://github.com/pypa/pip/issues/3032
@@ -54,6 +58,7 @@ setup(
         ],
     },
     entry_points={"console_scripts": ["formasaurus = formasaurus.__main__:main"]},
+    python_requires=">=3.9",
     classifiers=[
         "Development Status :: 4 - Beta",
         "License :: OSI Approved :: MIT License",
@@ -61,7 +66,6 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",

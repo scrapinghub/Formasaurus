@@ -1,7 +1,7 @@
 Install
 =======
 
-Formasaurus requires Python 3.8+.
+Formasaurus requires Python 3.9+.
 
 To install it, run::
 
