@@ -33,6 +33,7 @@ setup(
     packages=["formasaurus"],
     install_requires=[
         "docopt >= 0.4.0",
+        "packaging >= 14.0",
         "parsel >= 1.1.0",
         "platformdirs >= 3.2.0",
         "requests >= 1.0.0",
@@ -44,7 +45,7 @@ setup(
         "formasaurus": [
             "data/*.json",
             "data/html/*.html",
-            "data/built-in-model.joblib",
+            "data/*.joblib",
         ],
     },
     extras_require={

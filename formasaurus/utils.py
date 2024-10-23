@@ -1,5 +1,6 @@
 import os
 import sys
+from warnings import warn
 
 import requests
 import tldextract
@@ -15,6 +16,12 @@ def dependencies_string():
     numpy/scipy/scikit-learn versions; a string returned by this function
     can be used as a part of file name.
     """
+    warn(
+        "formasaurus.utils.dependencies_string() is deprecated.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+
     import numpy
     import scipy
     import sklearn

@@ -19,6 +19,7 @@ To build and send an HTML form submission request, use
 >>> from formasaurus import build_submission
 >>> form, data, submit_button = build_submission(html, "search", {"search query": "foo"})
 >>> request_data = form2request(form, data, click=submit_button)
+>>> request = request_data.to_requests()
 >>> requests.send(request)
 <Response [200]>
 
@@ -41,8 +42,8 @@ To get data about all detected forms and field types, use
     'user[password]': 'password'},
     'form': 'registration'})]
 
-Formasaurus only considers fields that are user-visible and have non-empty
-``name`` attribute. Other fields usually should be either submitted as-is
+Formasaurus only considers fields that are user-visible and have a non-empty
+``name`` attribute. Usually, other fields should be either submitted as is
 (hidden fields) or not sent to the server at all (fields without a ``name``
 attribute).
 

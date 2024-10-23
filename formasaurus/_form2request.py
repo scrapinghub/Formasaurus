@@ -24,6 +24,8 @@ def build_submission(
     and a minimum probability of *min_proba*. If there is no match,
     :exc:`ValueError` is raised.
 
+    .. note:: A probability is always a :class:`float` in the [0, 1] range.
+
     *fields* is a dictionary of key-value pairs of data to submit with the
     form, where keys are :ref:`supported field types <field-types>` instead of
     actual form field names.

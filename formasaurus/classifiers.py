@@ -1,15 +1,17 @@
 from __future__ import annotations
 
 import os
+from importlib.metadata import version
 
 import joblib
 from lxml.html import HtmlElement
+from packaging.version import Version
 from platformdirs import user_data_path
 
 from formasaurus import fieldtype_model, formtype_model
 from formasaurus.html import get_fields_to_annotate, get_forms, load_html
 from formasaurus.storage import Storage
-from formasaurus.utils import at_root, dependencies_string, thresholded
+from formasaurus.utils import at_root, thresholded
 
 DEFAULT_DATA_PATH = at_root("data")
 
@@ -23,8 +25,8 @@ def extract_forms(
     """Return a list of ``(form_elem, form_info)`` tuples, one tuple for each
     form found on *tree_or_html*.
 
-    ``form_info`` are :class:`dict` object with the results of :meth:`classify`
-    or :meth:`classify_proba`` calls, depending on *proba*.
+    ``form_info`` are :class:`dict` objects with the results of
+    :meth:`classify` or :meth:`classify_proba`` calls, depending on *proba*.
 
     *tree_or_html* is the HTML document from which form data should be
     extracted, either an lxml tree or HTML source code as a string or bytes.
@@ -32,7 +34,7 @@ def extract_forms(
     *proba* determines whether *form_info* values in the result include
     probability data (``True``) or not (``False``, default).
 
-    *threshold* is the minimum probability, in a [1, 0] range, for data to be
+    *threshold* is the minimum probability, in the [0, 1] range, for data to be
     included in the result.
 
     *fields* determines whether field type data is computed and included into
@@ -88,6 +90,11 @@ def classify_proba(form, threshold=0.0, fields=True):
     )
 
 
+def _default_model_file_name() -> str:
+    skl_version = Version(version("scikit-learn"))
+    return f"model-skl{skl_version.major}.{skl_version.minor}.joblib"
+
+
 class FormFieldClassifier:
     """
     FormFieldClassifier detects HTML form and field types.
@@ -112,22 +119,19 @@ class FormFieldClassifier:
 
         """
         if filename is None:
-            env_path = os.environ.get("FORMASAURUS_MODEL")
-            if env_path:
+            if env_path := os.environ.get("FORMASAURUS_MODEL"):
                 filename = os.path.expanduser(env_path)
-            elif rebuild:
-                writable_folder = user_data_path(
-                    appname="Formasaurus",
-                    appauthor="Zyte",
-                    roaming=True,
-                    ensure_exists=True,
-                )
-                path = writable_folder / (
-                    "formasaurus-%s.joblib" % dependencies_string()
-                )
-                filename = str(path)
             else:
-                filename = at_root("data", "built-in-model.joblib")
+                file_name = _default_model_file_name()
+                filename = at_root("data", file_name)
+                if rebuild or not os.path.exists(filename):
+                    writable_folder = user_data_path(
+                        appname="Formasaurus",
+                        appauthor="Zyte",
+                        roaming=True,
+                        ensure_exists=True,
+                    )
+                    filename = str(writable_folder / file_name)
 
         if rebuild or (autocreate and not os.path.exists(filename)):
             ex = cls.trained_on(DEFAULT_DATA_PATH)
