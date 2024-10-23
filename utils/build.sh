@@ -9,7 +9,7 @@ do
     python3 -m venv "$SCRIPT_DIR/_venv"
     . "$SCRIPT_DIR/_venv/bin/activate"
     pip install scikit-learn==$SKL_VERSION
-    pip install .[with-deps]
+    pip install .
     python3 "$SCRIPT_DIR/_build.py"
     deactivate
     rm -rf "$SCRIPT_DIR/.venv" &> /dev/null

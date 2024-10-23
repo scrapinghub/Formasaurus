@@ -11,15 +11,6 @@ def get_version():
         return re.findall(r'__version__ = "([\d\.\w]+)"', f.read())[0]
 
 
-with_deps_extras = [
-    "joblib >= 1.2.0",
-    "lxml >= 4.5.2",
-    "lxml-html-clean >= 0.1.0",
-    "scikit-learn >= 1.5.0",
-    "scipy >= 1.6.2",
-    "sklearn-crfsuite >= 0.5.0",
-]
-
 setup(
     name="formasaurus",
     version=get_version(),
@@ -33,10 +24,16 @@ setup(
     packages=["formasaurus"],
     install_requires=[
         "docopt >= 0.4.0",
+        "joblib >= 1.2.0",
+        "lxml >= 4.5.2",
+        "lxml-html-clean >= 0.1.0",
         "packaging >= 14.0",
         "parsel >= 1.1.0",
         "platformdirs >= 3.2.0",
         "requests >= 1.0.0",
+        "scikit-learn >= 1.5.0",
+        "scipy >= 1.6.2",
+        "sklearn-crfsuite >= 0.5.0",
         "tldextract >= 1.2.0",
         "tqdm >= 2.0",
         "w3lib >= 1.13.0",
@@ -49,9 +46,6 @@ setup(
         ],
     },
     extras_require={
-        # Work around https://github.com/pypa/pip/issues/3032
-        "with-deps": with_deps_extras,
-        "with_deps": with_deps_extras,
         "annotation": [
             "ipython[notebook] >= 4.0",
             "ipywidgets",
