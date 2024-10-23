@@ -25,8 +25,8 @@ examples. Use "Add New Pages" and "Annotate" IPython notebooks for that.
 
 If you want to improve Formasaurus ML models check :ref:`how-it-works` section.
 
-Generating the built-in model
------------------------------
+Generating built-in models
+--------------------------
 
 Every time we improve the training data or a new minor version of scikit-learn
 is released, we should re-train the built-in models:
