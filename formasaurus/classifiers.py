@@ -172,11 +172,14 @@ class FormFieldClassifier:
     def save(self, filename):
         if self.form_classifier is None or self._field_model is None:
             raise ValueError("FormFieldExtractor is not trained")
+        # Using joblib here is fine because we have control over
+        # sklearn-cfrsuite, used for the field model.
+        joblib.dump(self._field_model, self._field_filename(filename), compress=3)
+        # For the form classifier we use a custom serialization implementation,
+        # as using joblib could lead to breakages when mixing different
+        # scikit-learn versions.
         with open(self._form_filename(filename), "w") as fp:
             json.dump(self.form_classifier.to_dict(), fp)
-        # Using joblib is here because we have control over sklearn-cfrsuite,
-        # used for the field model.
-        joblib.dump(self._field_model, self._field_filename(filename), compress=3)
 
     def train(self, annotations):
         """Train FormFieldExtractor on a list of FormAnnotation objects."""
