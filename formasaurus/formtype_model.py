@@ -80,6 +80,21 @@ def _create_feature_union(features):
     return make_union(*[make_pipeline(fe, vec) for name, fe, vec in features])
 
 
+_PROB_CLF_CLASS = LogisticRegression
+
+
+def _is_prob_clf(clf):
+    return isinstance(clf, _PROB_CLF_CLASS)
+
+
+def _get_prob_clf():
+    return _PROB_CLF_CLASS(penalty="l2", C=5, fit_intercept=True)
+
+
+def _get_non_prob_clf():
+    return LinearSVC(C=0.5, random_state=0, fit_intercept=True)
+
+
 def get_model(prob=True):
     """
     Return a default model.
@@ -87,12 +102,118 @@ def get_model(prob=True):
     # XXX: fit_intercept is False for easier model debugging.
     # Intercept is included as a regular feature ("Bias").
 
-    if prob:
-        clf = LogisticRegression(penalty="l2", C=5, fit_intercept=True)
-    else:
-        clf = LinearSVC(C=0.5, random_state=0, fit_intercept=True)
-
+    clf = _get_prob_clf() if prob else _get_non_prob_clf()
     fe = _create_feature_union(FEATURES)
+    return make_pipeline(fe, clf)
+
+
+_VECTORIZER_INIT_ATTRIBUTES = {
+    "CountVectorizer": ("ngram_range", "min_df", "binary"),
+    "DictVectorizer": tuple(),
+    "TfidfVectorizer": ("ngram_range", "min_df", "binary", "stop_words", "analyzer"),
+}
+_VECTORIZER_NON_INIT_ATTRIBUTES = {
+    "CountVectorizer": ("vocabulary_",),
+    "DictVectorizer": ("feature_names_", "vocabulary_"),
+    "TfidfVectorizer": ("idf_", "vocabulary_"),
+}
+
+
+def to_dict(model):
+    clf = model.steps[1][1]
+    if not _is_prob_clf(clf):
+        raise NotImplementedError(
+            f"{clf.__class__.__name__} serialization is not implemented"
+        )
+
+    def serialize_value(value):
+        metadata = {}
+        if isinstance(value, np.ndarray):
+            value = value.tolist()
+            metadata["type"] = "np.array"
+        return {
+            "value": value,
+            **metadata,
+        }
+
+    def vectorizer_to_dict(vectorizer):
+        vectorizer_cls = vectorizer.__class__.__name__
+        if vectorizer_cls not in _VECTORIZER_INIT_ATTRIBUTES:
+            raise NotImplementedError(
+                f"Serialization of vectorizers of class {vectorizer_cls} is "
+                f"not implemented."
+            )
+        return {
+            "cls": vectorizer_cls,
+            "init": {
+                attribute: serialize_value(getattr(vectorizer, attribute))
+                for attribute in _VECTORIZER_INIT_ATTRIBUTES[vectorizer_cls]
+            },
+            **{
+                attribute: serialize_value(getattr(vectorizer, attribute))
+                for attribute in _VECTORIZER_NON_INIT_ATTRIBUTES[vectorizer_cls]
+            },
+        }
+
+    return {
+        "classes": clf.classes_.tolist(),
+        "coef": clf.coef_.tolist(),
+        "features": [
+            (
+                transformer.__class__.__name__,
+                vectorizer_to_dict(vectorizer),
+            )
+            for _, transformer, vectorizer in FEATURES
+        ],
+        "intercept": clf.intercept_.tolist(),
+    }
+
+
+VECTORIZER_CLASSES = {
+    "CountVectorizer": CountVectorizer,
+    "DictVectorizer": DictVectorizer,
+    "TfidfVectorizer": TfidfVectorizer,
+}
+
+
+def from_dict(obj):
+    clf = _get_prob_clf()
+    clf.classes_ = np.array(obj["classes"])
+    clf.coef_ = np.array(obj["coef"])
+    clf.intercept_ = np.array(obj["intercept"])
+
+    def unserialize_value(value):
+        type_id = value.get("type", None)
+        if not type_id:
+            return value["value"]
+        if type_id == "np.array":
+            return np.array(value["value"])
+        raise NotImplementedError(
+            f"Cannot unserialize value of unexpected type {type_id}"
+        )
+
+    def vectorizer_from_dict(data):
+        cls_name = data.pop("cls")
+        if cls_name not in VECTORIZER_CLASSES:
+            raise NotImplementedError(
+                f"Cannot unserialize a vectorizer of class {cls_name}"
+            )
+        vectorizer = VECTORIZER_CLASSES[cls_name](
+            **{k: unserialize_value(v) for k, v in data.pop("init").items()}
+        )
+        for attribute, value in data.items():
+            setattr(vectorizer, attribute, unserialize_value(value))
+        return vectorizer
+
+    features_ = [
+        (
+            "_",
+            getattr(features, transformer)(),
+            vectorizer_from_dict(vectorizer),
+        )
+        for transformer, vectorizer in obj["features"]
+    ]
+    fe = _create_feature_union(features_)
     return make_pipeline(fe, clf)
 
 

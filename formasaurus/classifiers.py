@@ -1,11 +1,10 @@
 from __future__ import annotations
 
+import json
 import os
-from importlib.metadata import version
 
 import joblib
 from lxml.html import HtmlElement
-from packaging.version import Version
 from platformdirs import user_data_path
 
 from formasaurus import fieldtype_model, formtype_model
@@ -91,8 +90,7 @@ def classify_proba(form, threshold=0.0, fields=True):
 
 
 def _default_model_file_name() -> str:
-    skl_version = Version(version("scikit-learn"))
-    return f"model-skl{skl_version.major}.{skl_version.minor}.joblib"
+    return "model"
 
 
 class FormFieldClassifier:
@@ -103,6 +101,14 @@ class FormFieldClassifier:
     def __init__(self, form_classifier=None, field_model=None):
         self.form_classifier = form_classifier
         self._field_model = field_model
+
+    @staticmethod
+    def _field_filename(filename):
+        return f"{filename}-field.joblib"
+
+    @staticmethod
+    def _form_filename(filename):
+        return f"{filename}-form.json"
 
     @classmethod
     def load(cls, filename=None, autocreate=True, rebuild=False):
@@ -124,7 +130,7 @@ class FormFieldClassifier:
             else:
                 file_name = _default_model_file_name()
                 filename = at_root("data", file_name)
-                if rebuild or not os.path.exists(filename):
+                if rebuild or not os.path.exists(cls._form_filename(filename)):
                     writable_folder = user_data_path(
                         appname="Formasaurus",
                         appauthor="Zyte",
@@ -133,12 +139,18 @@ class FormFieldClassifier:
                     )
                     filename = str(writable_folder / file_name)
 
-        if rebuild or (autocreate and not os.path.exists(filename)):
+        if rebuild or (autocreate and not os.path.exists(cls._form_filename(filename))):
             ex = cls.trained_on(DEFAULT_DATA_PATH)
             ex.save(filename)
             return ex
 
-        return joblib.load(filename)
+        with open(cls._form_filename(filename)) as fp:
+            form_classifier = FormClassifier.from_dict(json.load(fp))
+        field_model = joblib.load(cls._field_filename(filename))
+        return cls(
+            form_classifier=form_classifier,
+            field_model=field_model,
+        )
 
     @classmethod
     def trained_on(cls, data_folder):
@@ -160,7 +172,11 @@ class FormFieldClassifier:
     def save(self, filename):
         if self.form_classifier is None or self._field_model is None:
             raise ValueError("FormFieldExtractor is not trained")
-        joblib.dump(self, filename, compress=3)
+        with open(self._form_filename(filename), "w") as fp:
+            json.dump(self.form_classifier.to_dict(), fp)
+        # Using joblib is here because we have control over sklearn-cfrsuite,
+        # used for the field model.
+        joblib.dump(self._field_model, self._field_filename(filename), compress=3)
 
     def train(self, annotations):
         """Train FormFieldExtractor on a list of FormAnnotation objects."""
@@ -274,6 +290,19 @@ class FormClassifier:
         self.model = form_model
         self.full_type_names = full_type_names
 
+    @classmethod
+    def from_dict(cls, obj):
+        return cls(
+            form_model=formtype_model.from_dict(obj["model"]),
+            full_type_names=obj["full_type_names"],
+        )
+
+    def to_dict(self):
+        return {
+            "model": formtype_model.to_dict(self.model),
+            "full_type_names": self.full_type_names,
+        }
+
     def classify(self, form):
         """
         Return form class.
@@ -290,7 +319,7 @@ class FormClassifier:
         return self._probs2dict(probs, threshold)
 
     def train(self, annotations):
-        """Train FormExtractor on a list of FormAnnotation objects."""
+        """Train formtype_model on a list of FormAnnotation objects."""
         self.model = formtype_model.train(
             annotations=annotations,
             full_type_names=self.full_type_names,
@@ -312,7 +341,7 @@ class FormClassifier:
     @property
     def classes(self):
         if self.model is None:
-            raise ValueError("FormExtractor is not trained")
+            raise ValueError("formtype_model is not trained")
         return self.model.steps[-1][1].classes_
 
     def _probs2dict(self, probs, threshold):

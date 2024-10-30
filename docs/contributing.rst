@@ -28,23 +28,12 @@ If you want to improve Formasaurus ML models check :ref:`how-it-works` section.
 Generating built-in models
 --------------------------
 
-Every time we improve the training data or a new minor version of scikit-learn
-is released, we should re-train the built-in models:
+Every time we improve the training data, we should re-train the built-in model:
 
-#.  Update ``utils/SKL_VERSIONS.txt`` with all versions of scikit-learn for
-    which a model should be pre-built. It should contain the latest patch
-    version for every supported minor version, separated by a space, e.g.
+.. code-block:: sh
 
-    .. code-block:: none
-
-        1.4.2 1.5.2
-
-#.  Run the following Bash script to build a model for each scikit-learn
-    version:
-
-    .. code-block:: sh
-
-        bash utils/build.sh
+    pip install .
+    python utils/build.py
 
 Authors
 -------

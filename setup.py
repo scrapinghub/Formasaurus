@@ -27,6 +27,7 @@ setup(
         "joblib >= 1.2.0",
         "lxml >= 4.5.2",
         "lxml-html-clean >= 0.1.0",
+        "numpy >= 1.19.5",
         "packaging >= 14.0",
         "parsel >= 1.1.0",
         "platformdirs >= 3.2.0",
@@ -40,9 +41,9 @@ setup(
     ],
     package_data={
         "formasaurus": [
+            "data/*.joblib",
             "data/*.json",
             "data/html/*.html",
-            "data/*.joblib",
         ],
     },
     extras_require={

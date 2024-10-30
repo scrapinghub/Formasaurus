@@ -1,5 +1,4 @@
 *.pyc
-formasaurus-*.joblib
 *egg-info
 .tox
 build
@@ -9,7 +8,6 @@ dist
 htmlcov
 .coverage.*
 .coverage
-.joblib
 .cache
 .pytest_cache
 docs/_build
