@@ -179,7 +179,7 @@ class FormFieldClassifier:
         # as using joblib could lead to breakages when mixing different
         # scikit-learn versions.
         with open(self._form_filename(filename), "w") as fp:
-            json.dump(self.form_classifier.to_dict(), fp)
+            json.dump(self.form_classifier.to_dict(), fp, ensure_ascii=False)
 
     def train(self, annotations):
         """Train FormFieldExtractor on a list of FormAnnotation objects."""

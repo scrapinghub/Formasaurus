@@ -95,7 +95,7 @@ def test_save_and_load(tmpdir):
     def serialize_forms(forms):
         # Exclude unserializable FormElement instances
         forms = [form[1] for form in forms]
-        return json.dumps(forms, sort_keys=True)
+        return json.dumps(forms, sort_keys=True, ensure_ascii=False)
 
     assert serialize_forms(forms_a) == serialize_forms(forms_b)
 
