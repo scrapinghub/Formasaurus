@@ -119,8 +119,8 @@ _VECTORIZER_NON_INIT_ATTRIBUTES = {
 }
 
 
-def to_dict(model):
-    clf = model.steps[1][1]
+def to_dict(pipeline):
+    clf = pipeline.steps[1][1]
     if not _is_prob_clf(clf):
         raise NotImplementedError(
             f"{clf.__class__.__name__} serialization is not implemented"
