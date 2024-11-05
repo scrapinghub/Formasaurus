@@ -89,10 +89,6 @@ def classify_proba(form, threshold=0.0, fields=True):
     )
 
 
-def _default_model_file_name() -> str:
-    return "model"
-
-
 class FormFieldClassifier:
     """
     FormFieldClassifier detects HTML form and field types.
@@ -128,8 +124,7 @@ class FormFieldClassifier:
             if env_path := os.environ.get("FORMASAURUS_MODEL"):
                 filename = os.path.expanduser(env_path)
             else:
-                file_name = _default_model_file_name()
-                filename = at_root("data", file_name)
+                filename = at_root("data", "model")
                 if rebuild or not os.path.exists(cls._form_filename(filename)):
                     writable_folder = user_data_path(
                         appname="Formasaurus",
@@ -137,7 +132,7 @@ class FormFieldClassifier:
                         roaming=True,
                         ensure_exists=True,
                     )
-                    filename = str(writable_folder / file_name)
+                    filename = str(writable_folder / "model")
 
         if rebuild or (autocreate and not os.path.exists(cls._form_filename(filename))):
             ex = cls.trained_on(DEFAULT_DATA_PATH)

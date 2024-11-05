@@ -5,9 +5,9 @@ from time import process_time
 import pytest
 
 import formasaurus
-from formasaurus.classifiers import FormFieldClassifier, _default_model_file_name
+from formasaurus import FormFieldClassifier
 
-FILENAME = _default_model_file_name()
+FILENAME = "model"
 
 
 def test_non_existing_model(tmpdir):
