@@ -25,6 +25,16 @@ examples. Use "Add New Pages" and "Annotate" IPython notebooks for that.
 
 If you want to improve Formasaurus ML models check :ref:`how-it-works` section.
 
+Generating the built-in model
+-----------------------------
+
+Every time we improve the training data, we should re-train the built-in model:
+
+.. code-block:: sh
+
+    pip install .
+    python utils/build.py
+
 Authors
 -------
 

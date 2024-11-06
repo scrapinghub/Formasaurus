@@ -1,6 +1,7 @@
 import itertools
 
 import numpy as np
+import pytest
 from sklearn_crfsuite.metrics import flat_accuracy_score
 
 from formasaurus.fieldtype_model import _PRECISE_C1_C2, _REALISTIC_C1_C2, get_Xy, train
@@ -17,15 +18,16 @@ def test_training(storage, capsys):
     )
     annotations = list(itertools.islice(annotations, 0, 300))
 
-    crf = train(
-        annotations=annotations,
-        use_precise_form_types=False,
-        optimize_hyperparameters_iters=2,
-        optimize_hyperparameters_folds=2,
-        optimize_hyperparameters_jobs=-1,
-        full_form_type_names=False,
-        full_field_type_names=False,
-    )
+    with pytest.warns(UserWarning, match="RandomizedSearchCV n_iter is low"):
+        crf = train(
+            annotations=annotations,
+            use_precise_form_types=False,
+            optimize_hyperparameters_iters=2,
+            optimize_hyperparameters_folds=2,
+            optimize_hyperparameters_jobs=-1,
+            full_form_type_names=False,
+            full_field_type_names=False,
+        )
 
     out, err = capsys.readouterr()
 

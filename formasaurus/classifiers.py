@@ -1,24 +1,44 @@
+from __future__ import annotations
+
+import json
 import os
 
 import joblib
+from lxml.html import HtmlElement
+from platformdirs import user_data_path
 
 from formasaurus import fieldtype_model, formtype_model
 from formasaurus.html import get_fields_to_annotate, get_forms, load_html
 from formasaurus.storage import Storage
-from formasaurus.utils import at_root, dependencies_string, thresholded
+from formasaurus.utils import at_root, thresholded
 
 DEFAULT_DATA_PATH = at_root("data")
 
 
-def extract_forms(tree_or_html, proba=False, threshold=0.05, fields=True):
-    """
-    Given a lxml tree or HTML source code, return a list of
-    ``(form_elem, form_info)`` tuples.
+def extract_forms(
+    tree_or_html: HtmlElement | str | bytes,
+    proba: bool = False,
+    threshold: float = 0.05,
+    fields: bool = True,
+):
+    """Return a list of ``(form_elem, form_info)`` tuples, one tuple for each
+    form found on *tree_or_html*.
 
-    ``form_info`` dicts contain results of :meth:`classify` or
-    :meth:`classify_proba`` calls, depending on ``proba`` parameter.
+    ``form_info`` are :class:`dict` objects with the results of
+    :meth:`classify` or :meth:`classify_proba`` calls, depending on *proba*.
 
-    When ``fields`` is False, field type information is not computed.
+    *tree_or_html* is the HTML document from which form data should be
+    extracted, either an lxml tree or HTML source code as a string or bytes.
+
+    *proba* determines whether *form_info* values in the result include
+    probability data (``True``) or not (``False``, default).
+
+    *threshold* is the minimum probability, in the [0, 1] range, for data to be
+    included in the result.
+
+    *fields* determines whether field type data is computed and included into
+    the *form_info* values in the result (``True``, default) or not
+    (``False``).
     """
     return get_instance().extract_forms(
         tree_or_html=tree_or_html,
@@ -78,6 +98,14 @@ class FormFieldClassifier:
         self.form_classifier = form_classifier
         self._field_model = field_model
 
+    @staticmethod
+    def _field_filename(filename):
+        return f"{filename}-field.joblib"
+
+    @staticmethod
+    def _form_filename(filename):
+        return f"{filename}-form.json"
+
     @classmethod
     def load(cls, filename=None, autocreate=True, rebuild=False):
         """
@@ -93,14 +121,31 @@ class FormFieldClassifier:
 
         """
         if filename is None:
-            filename = cls._cached_model_path()
+            if env_path := os.environ.get("FORMASAURUS_MODEL"):
+                filename = os.path.expanduser(env_path)
+            else:
+                filename = at_root("data", "model")
+                if rebuild or not os.path.exists(cls._form_filename(filename)):
+                    writable_folder = user_data_path(
+                        appname="Formasaurus",
+                        appauthor="Zyte",
+                        roaming=True,
+                        ensure_exists=True,
+                    )
+                    filename = str(writable_folder / "model")
 
-        if rebuild or (autocreate and not os.path.exists(filename)):
+        if rebuild or (autocreate and not os.path.exists(cls._form_filename(filename))):
             ex = cls.trained_on(DEFAULT_DATA_PATH)
             ex.save(filename)
             return ex
 
-        return joblib.load(filename)
+        with open(cls._form_filename(filename)) as fp:
+            form_classifier = FormClassifier.from_dict(json.load(fp))
+        field_model = joblib.load(cls._field_filename(filename))
+        return cls(
+            form_classifier=form_classifier,
+            field_model=field_model,
+        )
 
     @classmethod
     def trained_on(cls, data_folder):
@@ -122,7 +167,14 @@ class FormFieldClassifier:
     def save(self, filename):
         if self.form_classifier is None or self._field_model is None:
             raise ValueError("FormFieldExtractor is not trained")
-        joblib.dump(self, filename, compress=3)
+        # Using joblib here is fine because we have control over
+        # sklearn-cfrsuite, used for the field model.
+        joblib.dump(self._field_model, self._field_filename(filename), compress=3)
+        # For the form classifier we use a custom serialization implementation,
+        # as using joblib could lead to breakages when mixing different
+        # scikit-learn versions.
+        with open(self._form_filename(filename), "w") as fp:
+            json.dump(self.form_classifier.to_dict(), fp, ensure_ascii=False)
 
     def train(self, annotations):
         """Train FormFieldExtractor on a list of FormAnnotation objects."""
@@ -216,14 +268,6 @@ class FormFieldClassifier:
         else:
             return [(form, self.classify(form, fields)) for form in forms]
 
-    @classmethod
-    def _cached_model_path(cls):
-        env_path = os.environ.get("FORMASAURUS_MODEL")
-        if env_path:
-            return os.path.expanduser(env_path)
-        path = "formasaurus-%s.joblib" % dependencies_string()
-        return at_root(path)
-
     @property
     def form_classes(self):
         """Possible form classes"""
@@ -244,6 +288,19 @@ class FormClassifier:
         self.model = form_model
         self.full_type_names = full_type_names
 
+    @classmethod
+    def from_dict(cls, obj):
+        return cls(
+            form_model=formtype_model.from_dict(obj["model"]),
+            full_type_names=obj["full_type_names"],
+        )
+
+    def to_dict(self):
+        return {
+            "model": formtype_model.to_dict(self.model),
+            "full_type_names": self.full_type_names,
+        }
+
     def classify(self, form):
         """
         Return form class.
@@ -260,7 +317,7 @@ class FormClassifier:
         return self._probs2dict(probs, threshold)
 
     def train(self, annotations):
-        """Train FormExtractor on a list of FormAnnotation objects."""
+        """Train formtype_model on a list of FormAnnotation objects."""
         self.model = formtype_model.train(
             annotations=annotations,
             full_type_names=self.full_type_names,
@@ -282,7 +339,7 @@ class FormClassifier:
     @property
     def classes(self):
         if self.model is None:
-            raise ValueError("FormExtractor is not trained")
+            raise ValueError("formtype_model is not trained")
         return self.model.steps[-1][1].classes_
 
     def _probs2dict(self, probs, threshold):

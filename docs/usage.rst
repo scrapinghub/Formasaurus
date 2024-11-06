@@ -6,21 +6,22 @@ Basic Usage
 
 Grab some HTML:
 
-    >>> import requests
-    >>> html = requests.get('https://www.github.com/').text
+>>> import requests
+>>> html = requests.get('https://www.github.com/').text
 
-Then use :func:`formasaurus.extract_forms <formasaurus.classifiers.extract_forms>`
-to detect form and field types:
+To build and send an HTML form submission request, use
+:func:`~formasaurus.build_submission`, the :doc:`form2request library
+<form2request:index>`, and an HTTP client like the :doc:`requests library
+<requests:index>`:
 
-    >>> import formasaurus
-    >>> formasaurus.extract_forms(html)
-    [(<Element form at 0x1150ba0e8>,
-      {'fields': {'q': 'search query'}, 'form': 'search'}),
-     (<Element form at 0x1150ba138>,
-      {'fields': {'user[email]': 'email',
-        'user[login]': 'username',
-        'user[password]': 'password'},
-       'form': 'registration'})]
+>>> import requests
+>>> from form2request import form2request
+>>> from formasaurus import build_submission
+>>> form, data, submit_button = build_submission(html, "search", {"search query": "foo"})
+>>> request_data = form2request(form, data, click=submit_button)
+>>> request = request_data.to_requests()
+>>> requests.send(request)
+<Response [200]>
 
 .. note::
 
@@ -28,19 +29,23 @@ to detect form and field types:
     models on user machine. This is done automatically on first call;
     models are saved to a file and then reused.
 
-:func:`formasaurus.extract_forms <formasaurus.classifiers.extract_forms>`
-returns a list of (form, info) tuples, one tuple for each ``<form>``
-element on a page. ``form`` is a lxml Element for a form,
-``info`` dict contains form and field types.
+To get data about all detected forms and field types, use
+:func:`~formasaurus.classifiers.extract_forms`:
 
-Only fields which are
+>>> import formasaurus
+>>> formasaurus.extract_forms(html)
+[(<Element form at 0x1150ba0e8>,
+  {'fields': {'q': 'search query'}, 'form': 'search'}),
+  (<Element form at 0x1150ba138>,
+  {'fields': {'user[email]': 'email',
+    'user[login]': 'username',
+    'user[password]': 'password'},
+    'form': 'registration'})]
 
-1. visible to user;
-2. have non-empty ``name`` attribute
-
-are returned - other fields usually should be either submitted as-is
-(hidden fields) or not sent to the server at all (fields without
-``name`` attribute).
+Formasaurus only considers fields that are user-visible and have a non-empty
+``name`` attribute. Usually, other fields should be either submitted as is
+(hidden fields) or not sent to the server at all (fields without a ``name``
+attribute).
 
 There are edge cases like fields filled with JS or fields which are made
 invisible using CSS, but all bets are off if page uses JS heavily and all
@@ -109,6 +114,7 @@ In this example the data is loaded from an URL; of course, data may be
 loaded from a local file or from an in-memory object, or you may already
 have the tree loaded (e.g. with Scrapy).
 
+.. _form-types:
 
 Form Types
 ----------
@@ -136,6 +142,8 @@ and tries to predict form types in the remaining fold. This is repeated to get
 predictions for the whole dataset.
 
 See also: https://en.wikipedia.org/wiki/Precision_and_recall
+
+.. _field-types:
 
 Field Types
 -----------

@@ -186,8 +186,8 @@ def get_text_around_elems(tree, elems):
     if not elems:
         return {}, {}
     buf = []
-    before = {elem: "" for elem in elems}
-    after = {elem: "" for elem in elems}
+    before = dict.fromkeys(elems, "")
+    after = dict.fromkeys(elems, "")
 
     def flush_buf():
         res = "  ".join(
