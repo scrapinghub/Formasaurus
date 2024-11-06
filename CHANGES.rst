@@ -1,6 +1,48 @@
 Changes
 =======
 
+0.10.0 (2024-11-DD)
+-------------------
+
+* Dropped official support for Python 3.8.
+
+* The minimum supported versions of some dependencies have changed:
+
+  * ``lxml``: ``4.4.1`` → ``4.5.2``
+  * ``scikit-learn``: ``0.24.0`` → ``1.5.0``
+  * ``scipy``: ``1.5.0`` → ``1.6.2``
+
+* New dependencies have been added:
+
+  * ``numpy`` ≥ ``1.19.5``
+  * ``packaging`` ≥ ``14.0``
+  * ``parsel`` ≥ ``1.1.0``
+  * ``platformdirs`` ≥ ``3.2.0``
+
+* The ``formasaurus.utils.dependencies_string()`` function is now deprecated.
+
+* Added a new function, :func:`~formasaurus.build_submission`, to make
+  Formasaurus :ref:`easier to use <usage>`.
+
+* Added a built-in model, so that you can use Formasaurus right away without
+  the need to first train a model on the built-in data.
+
+* Changed the model serialization format, to minimize the chance of breakage
+  due to new versions of dependencies.
+
+  As a result, when specifying a model path, it is no longer the path to a
+  single file, but the base path for multiple files. For example, if ``model``
+  is specified as file path, 2 files are created, ``model-field.joblib`` and
+  ``model-form.json``.
+
+* When building a model, if a file path is not specified, the file path used by
+  default is now guaranteed to be user-writable.
+
+* Removed the need to specify the ``[with-deps]`` or ``[with_deps]`` extra when
+  :ref:`installing <install>`.
+
+* Improved the docs of :func:`~formasaurus.classifiers.extract_forms`.
+
 0.9.0 (2024-06-19)
 ------------------
 
