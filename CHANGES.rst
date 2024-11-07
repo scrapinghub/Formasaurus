@@ -39,7 +39,7 @@ Changes
   default is now guaranteed to be user-writable.
 
 * Removed the need to specify the ``[with-deps]`` or ``[with_deps]`` extra when
-  installing <install.
+  installing.
 
 * Improved the docs of ``formasaurus.classifiers.extract_forms()``.
 
