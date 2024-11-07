@@ -18,6 +18,7 @@ setup(
     author_email="kmike84@gmail.com",
     license="MIT license",
     long_description=open("README.rst").read() + "\n\n" + open("CHANGES.rst").read(),
+    long_description_content_type="x-rst",
     description="Formasaurus tells you the types of HTML forms and their fields using machine learning",
     url="https://github.com/scrapinghub/Formasaurus",
     zip_safe=False,
