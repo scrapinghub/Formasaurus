@@ -1,7 +1,7 @@
 Changes
 =======
 
-0.10.0 (2024-11-DD)
+0.10.0 (2024-11-07)
 -------------------
 
 * Dropped official support for Python 3.8.
