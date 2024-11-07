@@ -21,8 +21,8 @@ Changes
 
 * The ``formasaurus.utils.dependencies_string()`` function is now deprecated.
 
-* Added a new function, :func:`~formasaurus.build_submission`, to make
-  Formasaurus :ref:`easier to use <usage>`.
+* Added a new function, ``build_submission``, to make Formasaurus :ref:`easier
+  to use <usage>`.
 
 * Added a built-in model, so that you can use Formasaurus right away without
   the need to first train a model on the built-in data.
