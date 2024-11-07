@@ -21,8 +21,8 @@ Changes
 
 * The ``formasaurus.utils.dependencies_string()`` function is now deprecated.
 
-* Added a new function, ``build_submission``, to make Formasaurus :ref:`easier
-  to use <usage>`.
+* Added a new function, ``build_submission``, to make Formasaurus easier to
+  use.
 
 * Added a built-in model, so that you can use Formasaurus right away without
   the need to first train a model on the built-in data.
@@ -39,9 +39,9 @@ Changes
   default is now guaranteed to be user-writable.
 
 * Removed the need to specify the ``[with-deps]`` or ``[with_deps]`` extra when
-  :ref:`installing <install>`.
+  installing <install.
 
-* Improved the docs of :func:`~formasaurus.classifiers.extract_forms`.
+* Improved the docs of ``formasaurus.classifiers.extract_forms()``.
 
 0.9.0 (2024-06-19)
 ------------------
